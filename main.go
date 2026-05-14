@@ -16,8 +16,8 @@ import (
 	"github.com/cyverse-de/go-mod/otelutils"
 	"github.com/spf13/viper"
 
-	"github.com/cyverse-de/messaging/v9"
-	"github.com/streadway/amqp"
+	"github.com/cyverse-de/messaging/v12"
+	amqp "github.com/rabbitmq/amqp091-go"
 
 	"go.opentelemetry.io/otel"
 )
