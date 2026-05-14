@@ -1,6 +1,6 @@
 module github.com/cyverse-de/infosquito2
 
-go 1.25.0
+go 1.26
 
 require (
 	github.com/cyverse-de/configurate v0.0.0-20220113221928-13d34aae3f0f
