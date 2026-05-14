@@ -244,10 +244,11 @@ func processDataobjects(context context.Context, log *logrus.Entry, rows *rowMet
 
 		classification = classify(id, doc, esDocs)
 
-		if classification == UpdateDocument {
+		switch classification {
+		case UpdateDocument:
 			log.Debugf("data-object %s, documents differ, indexing", id)
 			rows.dataobjectsUpdated++
-		} else if classification == IndexDocument {
+		case IndexDocument:
 			log.Debugf("data-object %s not in ES, indexing", id)
 			rows.dataobjectsAdded++
 		}
@@ -309,10 +310,11 @@ func processCollections(context context.Context, log *logrus.Entry, rows *rowMet
 			log.Debugf("Integrated CyVerse metadata: %+v", doc)
 		}
 
-		if classification == UpdateDocument {
+		switch classification {
+		case UpdateDocument:
 			log.Debugf("data-object %s, documents differ, indexing", id)
 			rows.collsUpdated++
-		} else if classification == IndexDocument {
+		case IndexDocument:
 			log.Debugf("data-object %s not in ES, indexing", id)
 			rows.collsAdded++
 		}
@@ -349,10 +351,11 @@ func processDeletions(context context.Context, log *logrus.Entry, rows *rowMetad
 				log.Errorf("Could not find type for document %s, making rash assumptions", id)
 				docType = "file"
 			}
-			if docType == "file" {
+			switch docType {
+			case "file":
 				log.Debugf("data-object %s not seen in ICAT, deleting", id)
 				rows.dataobjectsRemoved++
-			} else if docType == "folder" {
+			case "folder":
 				log.Debugf("collection %s not seen in ICAT, deleting", id)
 				rows.collsRemoved++
 			}
