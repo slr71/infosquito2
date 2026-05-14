@@ -215,7 +215,7 @@ func processDataobjects(context context.Context, log *logrus.Entry, rows *rowMet
 	if err != nil {
 		return err
 	}
-	defer dataobjects.Close()
+	defer logIfErr(dataobjects.Close, "closing data-objects rows")
 	for dataobjects.Next() {
 		var id, selectedJSON string
 		if err = dataobjects.Scan(&id, &selectedJSON); err != nil {
@@ -280,7 +280,7 @@ func processCollections(context context.Context, log *logrus.Entry, rows *rowMet
 	if err != nil {
 		return err
 	}
-	defer colls.Close()
+	defer logIfErr(colls.Close, "closing collections rows")
 	for colls.Next() {
 		var id, selectedJSON string
 		if err = colls.Scan(&id, &selectedJSON); err != nil {
@@ -407,13 +407,13 @@ func ReindexPrefix(context context.Context, icat *ICATConnection, dedb *DEDBConn
 	if err != nil {
 		return err
 	}
-	defer avusRows.Close()
+	defer logIfErr(avusRows.Close, "closing AVUs rows (deferred)")
 
 	avus, err := preprocessMetadata(avusRows)
 	if err != nil {
 		return err
 	}
-	avusRows.Close()
+	logIfErr(avusRows.Close, "closing AVUs rows")
 	deRollback()
 
 	icatTx, err := icat.BeginTx(ctx, nil)
@@ -445,7 +445,7 @@ func ReindexPrefix(context context.Context, icat *ICATConnection, dedb *DEDBConn
 
 	// PROCESS
 	indexer := es.NewBulkIndexer(ctx, 1000)
-	defer indexer.Flush()
+	defer logIfErr(indexer.Flush, "flushing bulk indexer (deferred)")
 
 	if err = processDataobjects(ctx, prefixlog, &rows, avus, esDocs, seenEsDocs, indexer, es, icatTx, irodsZone); err != nil {
 		return err
