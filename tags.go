@@ -64,7 +64,7 @@ func processTags(context context.Context, log *logrus.Entry, rows *rowMetadata, 
 	if err != nil {
 		return errors.Wrap(err, "Error fetching tags")
 	}
-	defer tags.Close()
+	defer logIfErr(tags.Close, "closing tags rows")
 	for tags.Next() {
 		var id, selectedJSON string
 		if err = tags.Scan(&id, &selectedJSON); err != nil {
@@ -137,7 +137,7 @@ func ReindexTags(context context.Context, db *DEDBConnection, es *ESConnection, 
 
 	// Index tags that exist (just do them all, don't worry about classifying updates/deletes or skipping unchanged)
 	indexer := es.NewBulkIndexer(ctx, 1000)
-	defer indexer.Flush()
+	defer logIfErr(indexer.Flush, "flushing tags bulk indexer (deferred)")
 
 	if err = processTags(ctx, taglog, &rows, seenDocs, indexer, es, tx, irodsZone); err != nil {
 		return errors.Wrap(err, "Error processing tags")
